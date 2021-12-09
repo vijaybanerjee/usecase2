@@ -1,0 +1,8 @@
+http:
+  port: "8081"
+  
+request:
+  host: "sys-stockemp-api-v1.us-e2.cloudhub.io"
+
+requestSales:
+  host: "sys-salesforceem-api-v1.us-e2.cloudhub.io"

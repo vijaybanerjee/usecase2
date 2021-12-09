@@ -1,0 +1,5 @@
+%dw 2.0
+
+type auto_d9e0b570_27b5_43cd_8ee8_df262978d6e7_Output_Variables_Retrieve_Variable = {|  |} {"typeAlias": "Serializable",
+"typeId": "java.io.Serializable"}
+

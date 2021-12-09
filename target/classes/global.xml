@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="3eb95343-8bcb-4d44-8041-2becb8c18be1" >
+		<http:listener-connection host="0.0.0.0" port="${http.port}" />
+	</http:listener-config>
+	<configuration-properties doc:name="Configuration properties" doc:id="c653950a-1469-4cdd-93fd-aab4e4363ce4" file="config.yaml" />
+	<http:request-config name="RequestDB" doc:name="HTTP Request configuration" doc:id="a8ced729-541b-40ab-987e-0c66020aeb80" >
+		<http:request-connection host="${request.host}" />
+	</http:request-config>
+	<http:request-config name="SalesForceRequest" doc:name="HTTP Request configuration" doc:id="992f7bf4-e8cc-4597-a520-47c6bbe3fcff" >
+		<http:request-connection host="${requestSales.host}" />
+	</http:request-config>
+</mule>
