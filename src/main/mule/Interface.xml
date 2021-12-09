@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<flow name="InterfaceFlow" doc:id="6536801e-389c-4a46-8293-89ed6dd8dbb5" >
+		<http:listener doc:name="Listener" doc:id="cf3ca781-6ec2-4480-9319-15110af097fd" config-ref="HTTP_Listener_config" path="/"/>
+		<set-variable value="" doc:name="setCode" doc:id="ddad3886-3e92-4a5b-bcd3-078e936c8f74" variableName="setCode"/>
+	</flow>
+</mule>

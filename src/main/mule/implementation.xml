@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:os="http://www.mulesoft.org/schema/mule/os" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd">
+	<flow name="GetEmployee" doc:id="0a9382b6-0349-4621-adc2-8efe98859a99" initialState="started">
+		<scheduler doc:name="Scheduler" doc:id="62ac0098-c263-494a-8ce8-b80f25535c6e" >
+			<scheduling-strategy >
+				<fixed-frequency frequency="2" timeUnit="MINUTES"/>
+			</scheduling-strategy>
+		</scheduler>
+		<os:retrieve doc:name="Retrieve_Max_ID" doc:id="4f65462b-a9eb-44e3-bfb8-93de0e0861a7" key="AccountNumber">
+			<os:default-value><![CDATA[0]]></os:default-value>
+		</os:retrieve>
+		<set-variable value="#[payload]" doc:name="Retrieve_Variable " doc:id="1467cf58-d905-467c-a500-f1ddd122f221" variableName="Retrieve_Variable "/>
+		<logger level="INFO" doc:name="Logger" doc:id="ce893524-46b2-4d94-bea8-a3a57575c671" message="#[payload]"/>
+		<http:request method="GET" doc:name="RequestToStockDB" doc:id="fa9a01c8-d2cf-49f5-a8ad-7434c6753ce2" config-ref="RequestDB" path="/api/getEmployee" responseTimeout="100000">
+			<http:query-params ><![CDATA[#[output application/java
+---
+{
+	maxID : payload
+}]]]></http:query-params>
+		</http:request>
+		<choice doc:name="Choice" doc:id="7276cdb4-f039-4526-a345-a656f8a37f1f" >
+			<when expression="#[not isEmpty(payload)]">
+				<os:store doc:name="Store" doc:id="c442f30f-af73-408f-96e0-1b48f3b41805" key="AccountNumber">
+			<os:value><![CDATA[#[max(payload.*ID) default vars.Retrieve_Variable]]]></os:value>
+		</os:store>
+				<ee:transform doc:name="Transform Message" doc:id="e3c1126c-9ba7-4ca7-b967-59148d008d7d">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+				<flow-ref doc:name="PostEmployee" doc:id="8e63a1a3-f5bd-42c1-a25f-7940f4ed89f1" name="PostEmployee"/>
+			</when>
+			<otherwise >
+				<ee:transform doc:name="Transform Message" doc:id="1ce7a014-4de2-4c9e-99f6-6b890e2769fd" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message: "No New Records Found"
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<logger level="INFO" doc:name="Logger" doc:id="42691530-1ca8-40c9-8285-4d14337d4612" message="#[payload]"/>
+			</otherwise>
+		</choice>
+	</flow>
+	<flow name="PostEmployee" doc:id="d9e0b570-27b5-43cd-8ee8-df262978d6e7">
+		<logger level="INFO" doc:name="Logger" doc:id="940d4a41-441e-4496-9410-f328a97719e3" message="#[payload]"/>
+		<ee:transform doc:name="Transform Message" doc:id="4631699a-dfcb-4938-bd64-d8cb99f0bf65" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+payload map (payload01 , indexOfPayload01 ) -> {
+	EmployeeName: payload01.EmployeeName,
+	Phone: payload01.Phone,
+	AccountNumber: payload01.ID 
+}
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="Transform Message" doc:id="3675f168-109d-4659-bdbe-c210739b328b" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="57e41dda-511f-4fed-ad42-b693cb70b6c2" message="#[payload]"/>
+		<http:request method="POST" doc:name="SalesForce /POST" doc:id="9a38810c-8b4d-442f-995e-d09d42387c8c" path="/api/postEmployee" config-ref="SalesForceRequest"/>
+		<logger level="INFO" doc:name="Logger" doc:id="aea41021-0a02-428a-a5ee-6557c6b4736d" message="#[payload]"/>
+	</flow>
+</mule>
